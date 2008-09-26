@@ -17,7 +17,7 @@ class Amok
     yield obj, mock
     
     unless mock.successful?
-      ex = Failed.new(mock.errors.join("\n"))
+      ex = Failed.new(mock.errors.join("  "))
       ex.errors = mock.errors.dup
       raise ex
     end
@@ -39,18 +39,17 @@ class Amok
     return NiceProxy.new(self, n)  unless method || block
 
     called = @called
-    called[[method, args]] = n
+    id = [method, args]
+    called[id] = n
     previous = @obj.method(method)  rescue nil
 
     @obj.extend Module.new { define_method(method, &block) }  if block
     @obj.extend Module.new {
       define_method(method) { |*actual_args|
         if args.nil? || args == actual_args
-          case called[[method, args]]
-          when Numeric
-            called[[method, args]] -= 1
-          when false
-            called[[method, args]] = true
+          case called[id]
+          when Numeric;  called[id] -= 1
+          when false;    called[id] = true
           end
           super
         else

@@ -54,7 +54,8 @@ class Amok
           end
           super
         else
-          previous ? previous.call(*actual_args) : super
+          # This loses the block being passed due to limitations in 1.8.
+          (block && previous) ? previous.call(*actual_args) : super
         end
       }
     }
@@ -95,7 +96,7 @@ class Amok
   end
 
   def successful?
-    errors == []
+    errors.empty?
   end
 
   class NiceProxy

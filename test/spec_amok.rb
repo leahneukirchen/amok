@@ -41,7 +41,7 @@ describe "Amok" do
       should.not.raise(ArgumentError) { @obj.pony(:pink) }
     end
   end
-  
+
   describe "with argumented stubs" do
     before do
       @obj = [1, 2, 3]
@@ -113,14 +113,14 @@ describe "Amok" do
       @mock.errors.should.include("fetch(42) was not called.")
     end
   end
-  
+
   describe "with forbidden calls" do
     before do
       @obj = [1, 2, 3]
       @mock = Amok.new(@obj)
       @mock.never.delete
     end
-    
+
     should "provide errors when the method was called" do
       @obj.delete(1)
       @mock.should.not.be.successful
@@ -135,19 +135,21 @@ describe "Amok" do
       @mock.bar.should.equal 69
     end
   end
-  
-  should "provide a shortcut to check automatically" do
-    should.not.raise {
-      Amok.with([1, 2, 3]) { |obj, mock|
-        mock.need.reverse
-        obj.reverse
-      }
-    }
 
-    should.raise(Amok::Failed) {
-      Amok.with([1, 2, 3]) { |obj, mock|
-        mock.need.reverse
+  describe "it also" do
+    should "provide a shortcut to check automatically" do
+      should.not.raise {
+        Amok.with([1, 2, 3]) { |obj, mock|
+          mock.need.reverse
+          obj.reverse
+        }
       }
-    }.errors.should.include("reverse was not called.")
+
+      should.raise(Amok::Failed) {
+        Amok.with([1, 2, 3]) { |obj, mock|
+          mock.need.reverse
+        }
+      }.errors.should.include("reverse was not called.")
+    end
   end
 end

@@ -1,4 +1,8 @@
-= Amok, a compact mock framework
+= Amok, a compact mock library
+
+Amok is a simple and compact mock library that is independent of any
+testing framework but made to work nicely with test/spec and bacon.
+It provides mocking and stubbing of any object's methods.
 
 
 == Whirl-wind tour
@@ -11,6 +15,8 @@
     }
   }
 
+  Item.find(1).name.should.equal "Deschutes"
+
   Amok.new(Google4R::Checkout::CheckoutCommand) {
     on.new { |*args|
       Amok.new(Google4R::Checkout::CheckoutCommand.new(*args)) {
@@ -21,10 +27,58 @@
     }
   }
 
-== Implemented things
+
+== Implemented features
+
+Amok.new(obj)::
+  creates a mock definition object to stub methods of obj.
+
+Amok.with(obj) { |obj, mock| ... }::
+  Use Amok.with to automatically check whether required methods have
+  been called.
+
+Amok.make(hash)::
+  is used to conveniently make mocks that return the hash values when
+  the hash key is sent.
+
+mock.on.method { ... }::
+  run the block when "method" is sent.  The block can call super
+  to call the original method.
+
+mock.on.method(args...) { ... }::
+  run the block when "method" is sent with exactly the same "args",
+  else run the original method.  The block can call super to call the
+  original method, as well.
+
+mock.need.method::
+  check that "method" is called
+
+mock.need(n).method::
+  check that "method" is called exactly n times.
+
+mock.need.method { ... }::
+  like mock.on.method { ... }, but check that method is called.
+
+mock.need(n).method { ... }::
+  like mock.on.method { ... }, but check that method is called exactly
+  n times.
+
+mock.never.method::
+  check that method is never called.
+
+mock.successful?::
+  returns whether all checks passed or not.
+
+mock.errors::
+  returns an array of failed checks.
 
 
 == Words of advice
+
+Mocking and stubbing are possibly dangerous operations, and easily can
+change the meaning of your tests in ways you don't intent.  Be alert,
+and only use them when needed.  Remember, the purpose of your tests is
+to test your code, and not test your mocks.
 
 
 == Thanks to
@@ -54,7 +108,7 @@ http://github.com/chneukirchen/amok/tree/master
 
 Copyright (C) 2008 Christian Neukirchen <purl.org/net/chneukirchen>
 
-Bacon is freely distributable under the terms of an MIT-style license.
+Amok is freely distributable under the terms of an MIT-style license.
 See COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 

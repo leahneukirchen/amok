@@ -6,6 +6,8 @@
 # See COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 class Amok
+  VERSION = '0.1'
+
   attr_reader :obj
 
   class Failed < RuntimeError

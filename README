@@ -1,0 +1,65 @@
+= Amok, a compact mock framework
+
+
+== Whirl-wind tour
+
+  Amok.new(Item) {
+    on.find(1) {
+      Amok.with(:name => "Deschutes",
+                :description => "Deschutes model Guitar",
+                :unit_price => Money.new(2400.00))
+    }
+  }
+
+  Amok.new(Google4R::Checkout::CheckoutCommand) {
+    on.new { |*args|
+      Amok.new(Google4R::Checkout::CheckoutCommand.new(*args)) {
+        need.send_to_google_checkout {
+          Amok.with(:redirect_url => "http://google.response.url")
+        }
+      }
+    }
+  }
+
+== Implemented things
+
+
+== Words of advice
+
+
+== Thanks to
+
+* raggi and jazen for making me write it.
+* authors of all previous mock libraries for inspiration.
+
+
+== History
+
+* September 25th, 2008: Coding started.
+
+
+== Contact
+
+Please mail bugs, suggestions and patches to
+<mailto:chneukirchen@gmail.com>.
+
+Git repository (rebased patches on master are most welcome):
+git://github.com/chneukirchen/amok.git
+
+Project page:
+http://github.com/chneukirchen/amok/tree/master
+
+
+== Copying
+
+Copyright (C) 2008 Christian Neukirchen <purl.org/net/chneukirchen>
+
+Bacon is freely distributable under the terms of an MIT-style license.
+See COPYING or http://www.opensource.org/licenses/mit-license.php.
+
+
+== Links
+
+Mocks Aren't Stubs:: <http://martinfowler.com/articles/mocksArentStubs.html>
+
+Christian Neukirchen:: <http://chneukirchen.org/>

@@ -17,12 +17,7 @@ class Amok
   def self.with(obj)
     mock = new(obj)
     yield obj, mock
-    
-    unless mock.successful?
-      ex = Failed.new(mock.errors.join("  "))
-      ex.errors = mock.errors.dup
-      raise ex
-    end
+    mock.validate
   end
 
   def self.make(hash, &block)
@@ -98,6 +93,14 @@ class Amok
 
   def successful?
     errors.empty?
+  end
+
+  def validate
+    unless successful?
+      ex = Failed.new(errors.join("  "))
+      ex.errors = errors.dup
+      raise ex
+    end
   end
 
   class NiceProxy

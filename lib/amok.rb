@@ -26,9 +26,15 @@ class Amok
     a.obj
   end
 
+  @@uuid = 0
+  def uuid
+    @@uuid += 1
+  end
+
   def initialize(obj, &block)
     @obj = obj
     @called = {}
+    @previous = {}
     instance_eval(&block)  if block
   end
 
@@ -38,23 +44,37 @@ class Amok
     called = @called
     id = [method, args]
     called[id] = n
-    previous = @obj.method(method)  rescue nil
+    _previous = @previous
 
-    @obj.extend Module.new { define_method(method, &block) }  if block
-    @obj.extend Module.new {
+    mock = self
+    (class << @obj; self; end).class_eval {
+      if block
+        current = "__current_#{method}_#{mock.uuid}__amok__"
+        define_method(current, &block)
+      end
+      begin
+        previous = "__previous_#{method}_#{mock.uuid}__amok__"
+        alias_method previous, method
+      rescue NameError
+        previous = nil
+      end
+      _previous[method] ||= previous
       define_method(method) { |*actual_args|
         if args.nil? || args == actual_args
           case called[id]
           when Numeric;  called[id] -= 1
           when false;    called[id] = true
           end
-          super
+          __send__(current || previous, *actual_args)
         else
-          # This loses the block being passed due to limitations in 1.8.
-          (block && previous) ? previous.call(*actual_args) : super
+          __send__(previous, *actual_args)
         end
       }
     }
+  end
+
+  def previous(method, *args, &block)
+    @obj.__send__(@previous[method], *args, &block)
   end
 
   def need(method=nil, args=nil, n=false, &block)
@@ -101,6 +121,17 @@ class Amok
       ex.errors = errors.dup
       raise ex
     end
+  end
+
+  def cleanup!
+    _previous = @previous
+    (class << @obj; self; end).class_eval {
+      _previous.each { |old, new|
+        new ? alias_method(old, new) : undef_method(old)
+      }
+      methods.each { |m| undef_method  if m =~ /__amok__\Z/ }
+    }
+    @obj
   end
 
   class NiceProxy

@@ -44,13 +44,13 @@ Amok.make(hash)::
   the hash key is sent.
 
 mock.on._method_ {...}::
-  run the block when _method_ is sent.  The block can call +super+
-  to call the original method.
+  run the block when _method_ is sent.  The block can call
+  +mock.previous(_method_, ...)+ to call the original method.
 
 mock.on._method_(_args_...) {...}::
   run the block when _method_ is sent with exactly the same _args_,
-  else run the original method.  The block can call +super+ to call the
-  original method, as well.
+  else run the original method.  The block can call
+  +mock.previous(_method_, ...)+ to call the original method.
 
 mock.on(method, args) {...}::
   like mock.on._method_, but _method_ can be passed as a symbol and _args_.
@@ -100,6 +100,7 @@ to test your code, and not test your mocks.
 == Thanks to
 
 * raggi and jazen for making me write it.
+* mfp for instance_exec.
 * authors of all previous mock libraries for inspiration.
 
 

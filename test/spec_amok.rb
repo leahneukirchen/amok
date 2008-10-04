@@ -20,7 +20,8 @@ describe "Amok" do
       @obj = [1, 2, 3]
       @mock = Amok.new(@obj)
       @mock.on.size { Math::PI }
-      @mock.on.reverse { self + super }
+      mock = @mock
+      @mock.on.reverse { self + mock.previous(:reverse) }
       @mock.on.pony { :oooh }
     end
 
@@ -39,6 +40,35 @@ describe "Amok" do
     should "allow any parameters if none are declared" do
       should.not.raise(ArgumentError) { @obj.pony }
       should.not.raise(ArgumentError) { @obj.pony(:pink) }
+    end
+
+    should "allow stubbing of singleton methods" do
+      def @obj.bar
+        "bar!"
+      end
+
+      require 'pp'
+      def @obj.quux(n)
+        "quux!"
+      end
+      @mock = Amok.new(@obj)
+
+      @mock.on.bar { "not bar!" }
+      @obj.bar.should.equal "not bar!"
+
+      @mock.on.quux(2) { :two }
+      @mock.on.quux(1) { :one }
+      @obj.quux(1).should.equal :one
+      @obj.quux(2).should.equal :two
+      @obj.quux(3).should.equal "quux!"
+    end
+
+    should "provide a way to clean up" do
+      @mock.cleanup!
+
+      @obj.size.should.equal 3
+      @obj.reverse.should.equal [3, 2, 1]
+      should.raise(NameError) { @obj.pony }
     end
   end
 
